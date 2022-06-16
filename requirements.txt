@@ -1,1 +1,7 @@
+alembic==1.8.0
+Mako==1.2.0
+MarkupSafe==2.1.1
+psycopg2-binary==2.9.3
+six==1.16.0
 SQLAlchemy==1.4.37
+SQLAlchemy-Utils==0.36.1
