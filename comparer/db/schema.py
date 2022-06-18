@@ -17,8 +17,8 @@ metadata = MetaData(naming_convention=convention)
 
 @unique
 class ShopUnitType(Enum):
-    offer = 'offer'
-    category = 'category'
+    offer = 'OFFER'
+    category = 'CATEGORY'
 
 
 nodes_table = Table(
@@ -34,6 +34,6 @@ nodes_table = Table(
 nodes_children_table = Table(
     'nodes_children',
     metadata,
-    Column('node_id', ForeignKey('nodes.id'), primary_key=True),
-    Column('children_id', ForeignKey('nodes.id'))
+    Column('children_id', ForeignKey('nodes.id'), primary_key=True),
+    Column('node_id', ForeignKey('nodes.id'))
 )

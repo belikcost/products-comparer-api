@@ -7,7 +7,7 @@ from setuptools import find_packages, setup
 module_name = 'comparer'
 
 module = SourceFileLoader(
-    module_name, os.path.join(module_name, '__init__.py.py')
+    module_name, os.path.join(module_name, '__init__.py')
 ).load_module()
 
 
