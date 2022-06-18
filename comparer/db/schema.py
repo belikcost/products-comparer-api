@@ -1,6 +1,7 @@
 from enum import unique, Enum
 
 from sqlalchemy import MetaData, Table, Column, Integer, String, Date, ForeignKey, Enum as PgEnum
+from sqlalchemy.dialects.postgresql import UUID
 
 convention = {
     'all_column_names': lambda constraint, table: '_'.join([
@@ -24,7 +25,7 @@ class ShopUnitType(Enum):
 nodes_table = Table(
     'nodes',
     metadata,
-    Column('id', String(36), primary_key=True),
+    Column('id', UUID, primary_key=True),
     Column('name', String, nullable=False),
     Column('date', Date, nullable=False),
     Column('type', PgEnum(ShopUnitType, name="shop_unit_type"), nullable=False),

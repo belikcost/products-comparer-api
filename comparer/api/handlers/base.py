@@ -1,3 +1,7 @@
+import json
+from http import HTTPStatus
+
+from aiohttp.web_response import Response
 from aiohttp.web_urldispatcher import View
 from asyncpgsa import PG
 from sqlalchemy import select, exists
@@ -18,3 +22,8 @@ class BaseView(View):
         ])
 
         return bool(await self.pg.fetchval(query))
+
+    @classmethod
+    def bad_request_response(cls, message):
+        return Response(status=HTTPStatus.BAD_REQUEST,
+                        body=json.dumps({'code': HTTPStatus.BAD_REQUEST, 'message': message}))
