@@ -69,7 +69,7 @@ class ImportsView(BaseView):
                     query.parameters = {}
                     await conn.fetchrow(query)
 
-        return Response(status=HTTPStatus.OK, text='Вставка или обновление прошли успешно')
+        return self.ok_response('Вставка или обновление прошли успешно')
 
     def deserialize_body(self):
         self.body = Import().load(self.body)

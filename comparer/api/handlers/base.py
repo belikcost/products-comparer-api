@@ -24,6 +24,10 @@ class BaseView(View):
         return bool(await self.pg.fetchval(query))
 
     @classmethod
+    def ok_response(cls, message):
+        return cls.response(HTTPStatus.OK, message)
+
+    @classmethod
     def bad_request_response(cls, message):
         return cls.response(HTTPStatus.BAD_REQUEST, message)
 
@@ -33,4 +37,6 @@ class BaseView(View):
 
     @classmethod
     def response(cls, code, message):
-        return Response(status=code, body=json.dumps({'code': code, 'message': message}))
+        return Response(
+            status=code, body=json.dumps({'code': code, 'message': message}), content_type='application/json'
+        )

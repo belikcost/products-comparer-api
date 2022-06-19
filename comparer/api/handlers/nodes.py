@@ -1,6 +1,5 @@
 from uuid import UUID
 
-from aiohttp.web_request import Request
 from aiohttp.web_response import json_response
 from sqlalchemy import select
 
@@ -12,19 +11,16 @@ from comparer.db.schema import nodes_table, relates_table, ShopUnitType, imports
 class NodesView(BaseView):
     URL_PATH = '/nodes/{id}'
 
-    def __init__(self, request: Request):
-        super().__init__(request)
-        self.body = None
-
     async def get(self):
         try:
             node_id = UUID(self.request.match_info['id'])
         except ValueError:
             return self.bad_request_response("Bad UUID")
 
-        serialized_detail_node = await self.get_detail_node_with_children(node_id)
-        if serialized_detail_node is None:
+        if not await self.check_node_exists(node_id):
             return self.not_found_response("Категория/товар не найден.")
+
+        serialized_detail_node = await self.get_detail_node_with_children(node_id)
         return json_response(serialized_detail_node)
 
     async def get_detail_node_with_children(self, node_id):
