@@ -1,4 +1,3 @@
-from datetime import datetime
 from http import HTTPStatus
 from json import JSONDecodeError
 
@@ -8,8 +7,8 @@ from marshmallow import ValidationError
 from sqlalchemy import select, exists
 
 from comparer.api.handlers.base import BaseView
-from comparer.api.schema import ImportNode, Import, UPDATE_DATE_FORMAT
-from comparer.db.schema import nodes_table, ShopUnitType, nodes_children_table
+from comparer.api.schema import Import
+from comparer.db.schema import nodes_table, relates_table, imports_table
 
 
 class ImportsView(BaseView):
@@ -33,22 +32,40 @@ class ImportsView(BaseView):
         import_nodes_children = self.get_import_nodes_children()
 
         async with self.pg.transaction() as conn:
+            query = imports_table.insert().values(date=self.body['update_date']).returning(imports_table.c.id)
+            query.parameters = {}
+            import_id = await conn.fetchval(query)
+
             for node in self.body['items']:
                 if str(node['id']) in existed_nodes_ids:
-                    query = nodes_table.update(nodes_table.c.id == node['id']).values(**node,
-                                                                                      date=self.body['updateDate'])
+                    query = nodes_table.update(nodes_table.c.id == node['id']).values(**node)
                 else:
-                    query = nodes_table.insert().values(**node, date=self.body['updateDate'])
+                    query = nodes_table.insert().values(**node)
                 query.parameters = {}
                 await conn.fetchrow(query)
 
+                if node['id'] not in import_nodes_children:
+                    if await self.check_children_exist(conn, node['id']):
+                        query = relates_table.update(relates_table.c.children_id == node['id']).values(
+                            children_id=node['id'], import_id=import_id
+                        )
+                    else:
+                        query = relates_table.insert().values(
+                            children_id=node['id'], import_id=import_id
+                        )
+                    query.parameters = {}
+                    await conn.fetchrow(query)
+
             for node_id in import_nodes_children:
                 for child_node_id in import_nodes_children[node_id]:
-                    if await self.check_children_exist(child_node_id):
-                        query = nodes_children_table.update(nodes_children_table.c.children_id == child_node_id).values(
-                            node_id=node['id'], children_id=child_node_id)
+                    if await self.check_children_exist(conn, child_node_id):
+                        query = relates_table.update(relates_table.c.children_id == child_node_id).values(
+                            node_id=node_id, children_id=child_node_id, import_id=import_id
+                        )
                     else:
-                        query = nodes_children_table.insert().values(node_id=node['id'], children_id=child_node_id)
+                        query = relates_table.insert().values(
+                            children_id=child_node_id, node_id=node_id, import_id=import_id
+                        )
                     query.parameters = {}
                     await conn.fetchrow(query)
 
@@ -56,7 +73,6 @@ class ImportsView(BaseView):
 
     def deserialize_body(self):
         self.body = Import().load(self.body)
-        self.body['items'] = [ImportNode().load(item) for item in self.body['items']]
 
     async def get_existed_nodes_ids(self):
         existed_nodes_ids = set()
@@ -69,15 +85,17 @@ class ImportsView(BaseView):
         import_nodes_children = {}
 
         for node in self.body['items']:
-            if not import_nodes_children.get(node['parentId']):
-                import_nodes_children[node['parentId']] = []
-            import_nodes_children[node['parentId']].append(node['id'])
-            node.pop('parentId')
+            if node['parent_id'] is None:
+                continue
+            if not import_nodes_children.get(node['parent_id']):
+                import_nodes_children[node['parent_id']] = []
+            import_nodes_children[node['parent_id']].append(node['id'])
         return import_nodes_children
 
-    async def check_children_exist(self, children_id):
+    @classmethod
+    async def check_children_exist(cls, conn, children_id):
         query = select([
-            exists().where(nodes_children_table.c.children_id == children_id)
+            exists().where(relates_table.c.children_id == children_id)
         ])
 
-        return bool(await self.pg.fetchval(query))
+        return bool(await conn.fetchval(query))

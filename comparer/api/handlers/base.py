@@ -25,5 +25,12 @@ class BaseView(View):
 
     @classmethod
     def bad_request_response(cls, message):
-        return Response(status=HTTPStatus.BAD_REQUEST,
-                        body=json.dumps({'code': HTTPStatus.BAD_REQUEST, 'message': message}))
+        return cls.response(HTTPStatus.BAD_REQUEST, message)
+
+    @classmethod
+    def not_found_response(cls, message):
+        return cls.response(HTTPStatus.NOT_FOUND, message)
+
+    @classmethod
+    def response(cls, code, message):
+        return Response(status=code, body=json.dumps({'code': code, 'message': message}))
