@@ -1,0 +1,5 @@
+include requirements.txt
+include comparer/alembic.ini
+include comparer/db/alembic/env.py
+include comparer/db/alembic/script.py.mako
+include comparer/db/alembic/versions/__init__.py

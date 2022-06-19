@@ -24,25 +24,16 @@ def load_requirements(filename: str) -> list:
 
 setup(
     name=module_name,
-    platforms='all',
-    classifiers=[
-        'Intended Audience :: Developers',
-        'Natural Language :: Russian',
-        'Operating System :: MacOS',
-        'Operating System :: POSIX',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: Implementation :: CPython'
-    ],
-    python_requires='>=3.8',
-    packages=find_packages(exclude=['tests']),
-    install_requires=load_requirements('requirements.txt'),
+    version="1.0",
+    platforms="all",
+    packages=find_packages(exclude=["tests"]),
+    install_requires=load_requirements("requirements.txt"),
     entry_points={
-        'console_scripts': [
-            '{0}-api = {0}.api.__main__:main'.format(module_name),
-            '{0}-db = {0}.db.__main__:main'.format(module_name)
-        ]
+        "console_scripts":
+            [
+                "comparer-api = comparer.api.__main__:main",
+                "comparer-db = comparer.db.__main__:main"
+            ]
     },
-    include_package_data=True
+    include_package_data=True,
 )

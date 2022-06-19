@@ -21,7 +21,7 @@ parser = ArgumentParser(
 )
 
 parser.add_argument('--api-address', default='0.0.0.0', help='IPv4/IPv6 address API server would listen on')
-parser.add_argument('--api-port', type=positive_int, default=8080, help='TCP port API server would listen on')
+parser.add_argument('--api-port', type=positive_int, default=80, help='TCP port API server would listen on')
 parser.add_argument('--pg-url', type=URL, default=URL(DEFAULT_PG_URL), help='URL to use to connect to the database')
 parser.add_argument('--pg-pool-min-size', type=int, default=10, help='Minimum database connections')
 parser.add_argument('--pg-pool-max-size', type=int, default=10, help='Maximum database connections')
