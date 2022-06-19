@@ -1,7 +1,6 @@
 from uuid import UUID
 
-from aiohttp.web_response import Response
-from sqlalchemy import select, delete, or_
+from sqlalchemy import delete, or_
 
 from comparer.api.handlers.base import BaseView
 from comparer.db.schema import relates_table, nodes_table

@@ -1,8 +1,6 @@
-from http import HTTPStatus
 from json import JSONDecodeError
 
 from aiohttp.web_request import Request
-from aiohttp.web_response import Response
 from marshmallow import ValidationError
 from sqlalchemy import select, exists
 
