@@ -3,6 +3,8 @@ services:
   db:
     image: postgres:latest
     container_name: database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=db_user
       - POSTGRES_PASSWORD=db_password
@@ -15,3 +17,5 @@ services:
       - "80:80"
     depends_on:
       - db
+volumes:
+  postgres_data:
