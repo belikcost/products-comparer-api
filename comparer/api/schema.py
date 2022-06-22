@@ -13,15 +13,18 @@ from comparer.utils.get_children_prices import get_children_prices
 UPDATE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 
-class ImportNode(Schema):
+class BaseNode(Schema):
     id = fields.UUID(required=True)
     name = fields.String(required=True)
-    parent_id = fields.UUID(data_key='parentId', allow_none=True)
-    type = EnumField(ShopUnitType, required=True, by_value=True)
-    price = fields.Integer(allow_none=True, strict=True)
 
     class Meta:
         ordered = True
+
+
+class ImportNode(BaseNode):
+    parent_id = fields.UUID(data_key='parentId', allow_none=True)
+    type = EnumField(ShopUnitType, required=True, by_value=True)
+    price = fields.Integer(allow_none=True, strict=True)
 
 
 class Import(Schema):
@@ -29,9 +32,7 @@ class Import(Schema):
     update_date = fields.DateTime(format=UPDATE_DATE_FORMAT, required=True, data_key="updateDate")
 
 
-class GetNode(Schema):
-    id = fields.UUID(required=True)
-    name = fields.String(required=True)
+class GetNode(BaseNode):
     type = EnumField(ShopUnitType, required=True, by_value=True)
     date = fields.Method("date_serializer")
     price = fields.Method('price_serializer')
